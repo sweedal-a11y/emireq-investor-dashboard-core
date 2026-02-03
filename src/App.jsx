@@ -9,6 +9,9 @@ import AnalyticsPage from "./pages/analytics/AnalyticsPage";
 import DocumentsPage from "./pages/documents/DocumentsPage";
 import DueDiligencePage from "./pages/diligence/DueDiligencePage";
 import LoginPage from "./pages/auth/LoginPage";
+import SignupPage from "./pages/auth/SignupPage";
+import RegisterPage from "./pages/auth/RegisterPage";
+import ReviewPage from "./pages/auth/ReviewPage";
 import LogoutModal from "./components/modals/LogoutModal";
 import "./App.css";
 
@@ -45,12 +48,16 @@ function AppContent() {
     setShowLogoutModal(false);
   };
 
-  // Don't show sidebar on login page
+  // Don't show sidebar on login page or signup page
   const isLoginPage = location.pathname === '/login';
+  const isSignupPage = location.pathname === '/signup';
+  const isRegisterPage = location.pathname === '/register';
+  const isReviewPage = location.pathname === '/review';
+  const isAuthPage = isLoginPage || isSignupPage || isRegisterPage || isReviewPage;
 
   return (
     <div className={`em-app ${isDarkMode ? 'em-app--dark' : ''}`}>
-      {!isLoginPage && (
+      {!isAuthPage && (
         <Sidebar 
           collapsed={sidebarCollapsed} 
           onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
@@ -58,9 +65,12 @@ function AppContent() {
         />
       )}
 
-      <main className={`em-main ${sidebarCollapsed ? 'em-main--expanded' : ''} ${isLoginPage ? 'em-main--full' : ''}`}>
+      <main className={`em-main ${sidebarCollapsed ? 'em-main--expanded' : ''} ${isAuthPage ? 'em-main--full' : ''}`}>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/review" element={<ReviewPage />} />
           <Route path="/" element={<Dashboard isDarkMode={isDarkMode} toggleTheme={toggleTheme} sidebarCollapsed={sidebarCollapsed} />} />
           <Route path="/diligence" element={<DueDiligencePage isDarkMode={isDarkMode} toggleTheme={toggleTheme} sidebarCollapsed={sidebarCollapsed} />} />
           <Route path="/profile" element={<ProfilePage toggleTheme={toggleTheme} />} />
