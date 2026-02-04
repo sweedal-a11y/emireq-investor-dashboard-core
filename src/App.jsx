@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, useNavigate, Navigate } from "react-router-dom";
 import Sidebar from "./components/sidebar/Sidebar";
 import Dashboard from "./pages/Dashboard";
 import ProfilePage from "./pages/profile/ProfilePage";
@@ -71,7 +71,8 @@ function AppContent() {
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/review" element={<ReviewPage />} />
-          <Route path="/" element={<Dashboard isDarkMode={isDarkMode} toggleTheme={toggleTheme} sidebarCollapsed={sidebarCollapsed} />} />
+          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/dashboard" element={<Dashboard isDarkMode={isDarkMode} toggleTheme={toggleTheme} sidebarCollapsed={sidebarCollapsed} />} />
           <Route path="/diligence" element={<DueDiligencePage isDarkMode={isDarkMode} toggleTheme={toggleTheme} sidebarCollapsed={sidebarCollapsed} />} />
           <Route path="/profile" element={<ProfilePage toggleTheme={toggleTheme} />} />
           <Route path="/portfolio" element={<Portfolio toggleTheme={toggleTheme} />} />

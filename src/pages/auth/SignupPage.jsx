@@ -130,6 +130,7 @@ export default function SignupPage() {
     // Store signup data and navigate to registration page
     localStorage.setItem('signupUsername', formData.username);
     localStorage.setItem('signupEmail', formData.email);
+    localStorage.setItem('signupPassword', formData.password);
     navigate('/register');
   };
 

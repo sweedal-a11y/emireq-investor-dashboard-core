@@ -1,25 +1,33 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import backgroundImg from '../../assets/background-login.png';
 import emireqLogo from '../../assets/emireq-logo.png';
+import pinkBg from '../../assets/pink.png';
+import pinkLogo from '../../assets/pink-logo.png';
+import firstImage from '../../assets/1stimage.png';
+import middleImage from '../../assets/middle.png';
+import lastImage from '../../assets/last.png';
 import './LoginPage.css';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  const [keepSignedIn, setKeepSignedIn] = useState(false);
   const [errors, setErrors] = useState({});
+  const [loginError, setLoginError] = useState('');
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = (e) => {
     e.preventDefault();
     
+    // Reset errors
+    setErrors({});
+    setLoginError('');
+    
     // Basic validation
     const newErrors = {};
-    if (!email) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Email is invalid';
+    if (!username.trim()) {
+      newErrors.username = 'Username is required';
     }
     
     if (!password) {
@@ -33,135 +41,227 @@ export default function LoginPage() {
       return;
     }
     
-    // Mock login - store token and navigate
-    localStorage.setItem('authToken', 'mock-token-12345');
-    navigate('/');
+    // Simulate authentication
+    // Check if credentials match demo account or registered user
+    const storedUser = localStorage.getItem('registeredUser');
+    let isValidLogin = false;
+    
+    // Check demo account
+    if (username.toLowerCase() === 'demo' && password === 'password') {
+      isValidLogin = true;
+    }
+    // Check registered user from localStorage
+    else if (storedUser) {
+      const userData = JSON.parse(storedUser);
+      if (username.toLowerCase() === userData.username?.toLowerCase() && password === userData.password) {
+        isValidLogin = true;
+      }
+    }
+    
+    if (isValidLogin) {
+      // Success - show modal
+      localStorage.setItem('authToken', 'mock-token-12345');
+      if (keepSignedIn) {
+        localStorage.setItem('keepSignedIn', 'true');
+      }
+      setShowSuccessModal(true);
+    } else {
+      // Show error
+      setLoginError('Invalid username or password. Please try again.');
+    }
+  };
+
+  const handleContinueToDashboard = () => {
+    setShowSuccessModal(false);
+    navigate('/dashboard');
   };
 
   return (
     <div className="login-page">
-      {/* Left Side - Background */}
-      <div className="login-left" style={{ backgroundImage: `url(${backgroundImg})` }}>
-        <div className="login-left-header">
+      {/* Left Side - Form Section */}
+      <div className="login-left">
+        <div className="login-header">
           <img src={emireqLogo} alt="Emireq" className="login-logo" />
-          <div className="login-language">
-            <span>English(UK)</span>
-            <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M1 1.5L6 6.5L11 1.5" stroke="#ffffff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </div>
         </div>
-        <div className="login-left-content">
-          <div className="login-trust-badge">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <g clipPath="url(#clip0_68_12726)">
-                <path d="M8.28086 12.9167C8.20647 12.6283 8.05615 12.3651 7.84555 12.1545C7.63494 11.9439 7.37176 11.7935 7.08336 11.7192L1.97086 10.4008C1.88364 10.3761 1.80687 10.3235 1.75221 10.2512C1.69754 10.1788 1.66797 10.0907 1.66797 9.99998C1.66797 9.90931 1.69754 9.82112 1.75221 9.74878C1.80687 9.67644 1.88364 9.62391 1.97086 9.59915L7.08336 8.27998C7.37166 8.20566 7.63477 8.05546 7.84537 7.84502C8.05596 7.63457 8.20634 7.37156 8.28086 7.08332L9.5992 1.97082C9.6237 1.88325 9.67618 1.8061 9.74863 1.75115C9.82108 1.69619 9.90951 1.66644 10.0004 1.66644C10.0914 1.66644 10.1798 1.69619 10.2523 1.75115C10.3247 1.8061 10.3772 1.88325 10.4017 1.97082L11.7192 7.08332C11.7936 7.37171 11.9439 7.6349 12.1545 7.8455C12.3651 8.0561 12.6283 8.20642 12.9167 8.28082L18.0292 9.59832C18.1171 9.62257 18.1946 9.67499 18.2499 9.74755C18.3052 9.8201 18.3351 9.90878 18.3351 9.99998C18.3351 10.0912 18.3052 10.1799 18.2499 10.2524C18.1946 10.325 18.1171 10.3774 18.0292 10.4017L12.9167 11.7192C12.6283 11.7935 12.3651 11.9439 12.1545 12.1545C11.9439 12.3651 11.7936 12.6283 11.7192 12.9167L10.4009 18.0292C10.3764 18.1167 10.3239 18.1939 10.2514 18.2488C10.179 18.3038 10.0905 18.3335 9.99961 18.3335C9.90868 18.3335 9.82025 18.3038 9.7478 18.2488C9.67535 18.1939 9.62287 18.1167 9.59836 18.0292L8.28086 12.9167Z" stroke="#FFC300" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M16.666 2.5V5.83333" stroke="#FFC300" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M18.3333 4.16669H15" stroke="#FFC300" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M3.33398 14.1667V15.8334" stroke="#FFC300" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M4.16667 15H2.5" stroke="#FFC300" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round"/>
-              </g>
-              <defs>
-                <clipPath id="clip0_68_12726">
-                  <rect width="20" height="20" fill="white"/>
-                </clipPath>
-              </defs>
-            </svg>
-            <span>Trusted by 50,000+ users worldwide</span>
-          </div>
-          <h1 className="login-left-title">Get Access to Your Investor Profile and Unlock Exclusive Deals.</h1>
-        </div>
-      </div>
 
-      {/* Right Side - Login Form */}
-      <div className="login-right">
         <div className="login-form-container">
-          <div className="login-form-header">
-            <img src={emireqLogo} alt="Emireq" className="login-form-logo" />
+          <h1 className="login-title">
+            {loginError ? 'Sign in to your account' : 'Welcome'}
+          </h1>
+          <p className="login-subtitle">Log in to continue your funding journey.</p>
+
+          {loginError && (
+            <div className="login-error-banner">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 6.66669V10M10 13.3334H10.0083M18.3333 10C18.3333 14.6024 14.6024 18.3334 10 18.3334C5.39763 18.3334 1.66667 14.6024 1.66667 10C1.66667 5.39765 5.39763 1.66669 10 1.66669C14.6024 1.66669 18.3333 5.39765 18.3333 10Z" stroke="#DC2626" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span>{loginError}</span>
+            </div>
+          )}
+
+          <form onSubmit={handleLogin} className="login-form">
+            <div className="login-form-group">
+              <label htmlFor="username" className="login-label">Username</label>
+              <input
+                type="text"
+                id="username"
+                value={username}
+                onChange={(e) => {
+                  setUsername(e.target.value);
+                  setErrors({ ...errors, username: '' });
+                  setLoginError('');
+                }}
+                className={`login-input ${errors.username ? 'login-input--error' : ''}`}
+                placeholder="username"
+              />
+              {errors.username && (
+                <span className="login-error">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 5.33331V7.99998M8 10.6666H8.00667M14.6667 7.99998C14.6667 11.6819 11.6819 14.6666 8 14.6666C4.3181 14.6666 1.33333 11.6819 1.33333 7.99998C1.33333 4.31808 4.3181 1.33331 8 1.33331C11.6819 1.33331 14.6667 4.31808 14.6667 7.99998Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  {errors.username}
+                </span>
+              )}
+            </div>
+
+            <div className="login-form-group">
+              <label htmlFor="password" className="login-label">Password</label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setErrors({ ...errors, password: '' });
+                  setLoginError('');
+                }}
+                className={`login-input ${errors.password ? 'login-input--error' : ''}`}
+                placeholder="••••••••••••"
+              />
+              {errors.password && (
+                <span className="login-error">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 5.33331V7.99998M8 10.6666H8.00667M14.6667 7.99998C14.6667 11.6819 11.6819 14.6666 8 14.6666C4.3181 14.6666 1.33333 11.6819 1.33333 7.99998C1.33333 4.31808 4.3181 1.33331 8 1.33331C11.6819 1.33331 14.6667 4.31808 14.6667 7.99998Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  {errors.password}
+                </span>
+              )}
+            </div>
+
+            <button type="submit" className="login-btn">
+              Log In
+            </button>
+
+            <div className="login-footer-row">
+              <label className="login-checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={keepSignedIn}
+                  onChange={(e) => setKeepSignedIn(e.target.checked)}
+                  className="login-checkbox"
+                />
+                <span className="login-checkbox-text">Keep me signed in</span>
+              </label>
+              <a href="/forgot-password" className="login-forgot-link">
+                Forget Password
+              </a>
+            </div>
+          </form>
+
+          <div className="login-divider">
+            <span>Or</span>
           </div>
 
-          <div className="login-form-content">
-            <h2 className="login-form-title">Welcome back</h2>
-            <p className="login-form-subtitle">
-              Access your Investor dashboard and funding journey
-            </p>
+          <p className="login-register-text">
+            Don't have an account?{' '}
+            <a href="/signup" className="login-register-link">
+              Register
+            </a>
+          </p>
 
-            <form onSubmit={handleLogin} className="login-form">
-              <div className="login-form-group">
-                <label htmlFor="email" className="login-form-label">
-                  Email address
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    setErrors({ ...errors, email: '' });
-                  }}
-                  className={`login-form-input ${errors.email ? 'login-form-input--error' : ''}`}
-                  placeholder="Enter your email"
-                />
-                {errors.email && (
-                  <span className="login-form-error">{errors.email}</span>
-                )}
-              </div>
+          <div className="login-social-text">
+            Verify your business email with Google or Linkedin
+          </div>
 
-              <div className="login-form-group">
-                <label htmlFor="password" className="login-form-label">
-                  Password
-                </label>
-                <div className="login-password-wrapper">
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    id="password"
-                    value={password}
-                    onChange={(e) => {
-                      setPassword(e.target.value);
-                      setErrors({ ...errors, password: '' });
-                    }}
-                    className={`login-form-input ${errors.password ? 'login-form-input--error' : ''}`}
-                    placeholder="Enter your password"
-                  />
-                  <button
-                    type="button"
-                    className="login-password-toggle"
-                    onClick={() => setShowPassword(!showPassword)}
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  >
-                    {showPassword ? (
-                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M2.5 10C2.5 10 5 4.16669 10 4.16669C15 4.16669 17.5 10 17.5 10C17.5 10 15 15.8334 10 15.8334C5 15.8334 2.5 10 2.5 10Z" stroke="#6B7280" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M10 12.5C11.3807 12.5 12.5 11.3807 12.5 10C12.5 8.61929 11.3807 7.5 10 7.5C8.61929 7.5 7.5 8.61929 7.5 10C7.5 11.3807 8.61929 12.5 10 12.5Z" stroke="#6B7280" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    ) : (
-                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M14.95 14.95C13.5255 16.0358 11.7908 16.6374 10 16.6667C5 16.6667 2.5 10.8334 2.5 10.8334C3.35545 9.06946 4.52357 7.48213 5.93333 6.14999L14.95 14.95Z" stroke="#6B7280" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M8.25 3.53332C8.82239 3.39907 9.41016 3.33195 10 3.33332C15 3.33332 17.5 9.16666 17.5 9.16666C17.0618 10.0582 16.5269 10.8986 15.9067 11.6717L8.25 3.53332Z" stroke="#6B7280" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M2.5 2.5L17.5 17.5" stroke="#6B7280" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    )}
-                  </button>
-                </div>
-                {errors.password && (
-                  <span className="login-form-error">{errors.password}</span>
-                )}
-              </div>
-
-              <button type="submit" className="login-submit-btn">
-                Log In
-              </button>
-            </form>
-
-            <p className="login-signup-text">
-              Don't have an account?{' '}
-              <a href="/signup" className="login-signup-link">
-                Sign up
-              </a>
-            </p>
+          <div className="login-social-buttons">
+            <button type="button" className="login-social-btn">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M22.56 12.25C22.56 11.47 22.49 10.72 22.36 10H12V14.26H17.92C17.66 15.63 16.88 16.79 15.71 17.57V20.34H19.28C21.36 18.42 22.56 15.6 22.56 12.25Z" fill="#4285F4"/>
+                <path d="M12 23C14.97 23 17.46 22.02 19.28 20.34L15.71 17.57C14.73 18.23 13.48 18.63 12 18.63C9.13 18.63 6.71 16.7 5.84 14.1H2.18V16.94C3.99 20.53 7.7 23 12 23Z" fill="#34A853"/>
+                <path d="M5.84 14.09C5.62 13.43 5.49 12.73 5.49 12C5.49 11.27 5.62 10.57 5.84 9.91V7.07H2.18C1.43 8.55 1 10.22 1 12C1 13.78 1.43 15.45 2.18 16.93L5.84 14.09Z" fill="#FBBC05"/>
+                <path d="M12 5.38C13.62 5.38 15.06 5.91 16.21 7.02L19.36 3.87C17.45 2.09 14.97 1 12 1C7.7 1 3.99 3.47 2.18 7.07L5.84 9.91C6.71 7.31 9.13 5.38 12 5.38Z" fill="#EA4335"/>
+              </svg>
+            </button>
+            <button type="button" className="login-social-btn">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20.447 20.452H16.893V14.883C16.893 13.555 16.866 11.846 15.041 11.846C13.188 11.846 12.905 13.291 12.905 14.785V20.452H9.351V9H12.765V10.561H12.811C13.288 9.661 14.448 8.711 16.181 8.711C19.782 8.711 20.448 11.081 20.448 14.166L20.447 20.452ZM5.337 7.433C4.193 7.433 3.274 6.507 3.274 5.368C3.274 4.23 4.194 3.305 5.337 3.305C6.477 3.305 7.401 4.23 7.401 5.368C7.401 6.507 6.476 7.433 5.337 7.433ZM7.119 20.452H3.555V9H7.119V20.452ZM22.225 0H1.771C0.792 0 0 0.774 0 1.729V22.271C0 23.227 0.792 24 1.771 24H22.222C23.2 24 24 23.227 24 22.271V1.729C24 0.774 23.2 0 22.222 0H22.225Z" fill="#0077B5"/>
+              </svg>
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Right Side - Visual Section */}
+      <div className="login-right">
+        <div className="login-right-container" style={{ backgroundImage: `url(${pinkBg})` }}>
+          <div className="login-right-content">
+            <img src={pinkLogo} alt="Emireq" className="login-right-logo" />
+            
+            <div className="login-cards-container">
+              <div className="login-card login-card-1">
+                <img src={firstImage} alt="Active investments" />
+              </div>
+              <div className="login-card login-card-2">
+                <img src={middleImage} alt="Chart" />
+              </div>
+              <div className="login-card login-card-3">
+                <img src={lastImage} alt="Total invested" />
+              </div>
+            </div>
+
+            <div className="login-support-text">
+              Experiencing issues?<br />
+              Get assistance via <a href="mailto:support@emireq.com">support@emireq.com</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="login-modal-overlay" onClick={() => setShowSuccessModal(false)}>
+          <div className="login-modal" onClick={(e) => e.stopPropagation()}>
+            <button 
+              className="login-modal-close"
+              onClick={() => setShowSuccessModal(false)}
+              aria-label="Close"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18 6L6 18M6 6L18 18" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+            
+            <div className="login-modal-icon">
+              <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M36.3347 16.6671C37.0958 20.4026 36.5534 24.2862 34.7978 27.6701C33.0421 31.0541 30.1795 33.7339 26.6872 35.2627C23.1949 36.7914 19.2841 37.0768 15.6068 36.0711C11.9296 35.0654 8.70833 32.8295 6.48014 29.7362C4.25195 26.6429 3.15155 22.8792 3.36245 19.0728C3.57335 15.2664 5.08281 11.6473 7.6391 8.81909C10.1954 5.99089 13.644 4.12452 17.4098 3.53123C21.1756 2.93793 25.031 3.65357 28.333 5.5588" stroke="#00A63E" strokeWidth="3.33333" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M15 18.3337L20 23.3337L36.6667 6.66699" stroke="#00A63E" strokeWidth="3.33333" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            
+            <h2 className="login-modal-title">Login Successful!</h2>
+            <p className="login-modal-text">
+              Welcome back! You're being redirected to your investor dashboard.
+            </p>
+            
+            <button 
+              className="login-modal-btn"
+              onClick={handleContinueToDashboard}
+            >
+              Continue to Dashboard
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

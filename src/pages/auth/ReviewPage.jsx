@@ -32,10 +32,26 @@ export default function ReviewPage() {
   };
 
   const handleSubmit = () => {
+    // Get signup credentials from localStorage
+    const signupUsername = localStorage.getItem('signupUsername');
+    const signupEmail = localStorage.getItem('signupEmail');
+    const signupPassword = localStorage.getItem('signupPassword') || '123456';
+    
+    // Store complete user registration data
+    if (signupUsername) {
+      const registeredUser = {
+        username: signupUsername,
+        email: signupEmail,
+        password: signupPassword,
+        formData: formData
+      };
+      localStorage.setItem('registeredUser', JSON.stringify(registeredUser));
+    }
+    
     // Submit the registration
     localStorage.setItem('authToken', 'mock-token-12345');
     localStorage.setItem('registrationComplete', 'true');
-    navigate('/');
+    navigate('/dashboard');
   };
 
   const getSectorNames = (sectors) => {
